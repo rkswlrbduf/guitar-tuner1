@@ -16,10 +16,13 @@
 
 package com.andryr.guitartuner;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+import android.view.View;
 
 /**
  * Created by andry on 24/04/16.
@@ -32,7 +35,7 @@ public class AudioProcessor implements Runnable {
 
 
     public interface PitchDetectionListener {
-        void onPitchDetected(float freq, double avgIntensity);
+        void onPitchDetected(float freq, double avgIntensity, short[] buffer);
     }
 
     private float mLastComputedFreq = 0;
@@ -53,6 +56,9 @@ public class AudioProcessor implements Runnable {
         do {
             int sampleRate = SAMPLE_RATES[i];
             int minBufSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            Log.i("minBufSize", String.valueOf(minBufSize));
+            Log.i("ERROR_BAD_VALUE", String.valueOf(AudioRecord.ERROR_BAD_VALUE));
+            Log.i("ERROR", String.valueOf(AudioRecord.ERROR));
             if (minBufSize != AudioRecord.ERROR_BAD_VALUE && minBufSize != AudioRecord.ERROR) {
                 mAudioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, Math.max(bufSize, minBufSize * 4));
             }
@@ -70,8 +76,7 @@ public class AudioProcessor implements Runnable {
     @Override
     public void run() {
 
-
-        Log.d(TAG, "sampleRate="+mAudioRecord.getSampleRate());
+        Log.i("sampleRate", "sampleRate="+mAudioRecord.getSampleRate());
 
         if(mAudioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
             Log.e(TAG, "AudioRecord not initialized");
@@ -84,16 +89,31 @@ public class AudioProcessor implements Runnable {
 
         do {
             final int read = mAudioRecord.read(buffer, 0, bufSize);
+
+
+
             if (read > 0) {
+
+                //Log.i("sampleRate", "sampleRate="+mAudioRecord.getSampleRate());
+
                 final double intensity = averageIntensity(buffer, read);
+                //Log.i("intensity", "intensity="+intensity);
 
                 int maxZeroCrossing = (int) (250 * (read / 8192) * (sampleRate / 44100.0));
+                //Log.i("maxZeroCrossing", "maxZeroCrossing="+maxZeroCrossing);
+                //Log.i("zeroCrossingCount", "zeroCrossingCount="+zeroCrossingCount(buffer));
 
-                if (intensity >= 50 && zeroCrossingCount(buffer) <= maxZeroCrossing) {
+                //if (intensity >= 50 && zeroCrossingCount(buffer) <= maxZeroCrossing) {
+                if (intensity >= 50) {
 
-                    float freq = getPitch(buffer, read / 4, read, sampleRate, 50, 500);
+                    float freq = getPitch(buffer, read / 4, read, sampleRate, 50, 4200);
+                    //Log.i("freq", "freq="+freq);
+
+                    for(int i=0;i<read;i++)
+                        Log.i("READ","READ"+i+"="+buffer[i]);
+
                     if (Math.abs(freq - mLastComputedFreq) <= 5f) {
-                        mPitchDetectionListener.onPitchDetected(freq, intensity);
+                        mPitchDetectionListener.onPitchDetected(freq, intensity, buffer);
                     }
                     mLastComputedFreq = freq;
 
@@ -104,6 +124,8 @@ public class AudioProcessor implements Runnable {
 
         Log.d(TAG, "Thread terminated");
     }
+
+
 
     private double averageIntensity(short[] data, int frames) {
 
