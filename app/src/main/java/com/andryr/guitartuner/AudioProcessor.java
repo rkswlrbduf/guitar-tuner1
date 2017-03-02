@@ -109,8 +109,8 @@ public class AudioProcessor implements Runnable {
                     float freq = getPitch(buffer, read / 4, read, sampleRate, 50, 4200);
                     //Log.i("freq", "freq="+freq);
 
-                    for(int i=0;i<read;i++)
-                        Log.i("READ","READ"+i+"="+buffer[i]);
+                    //for(int i=0;i<read;i++)
+                        //Log.i("READ","READ"+i+"="+buffer[i]);
 
                     if (Math.abs(freq - mLastComputedFreq) <= 5f) {
                         mPitchDetectionListener.onPitchDetected(freq, intensity, buffer);

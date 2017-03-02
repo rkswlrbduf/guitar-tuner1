@@ -62,6 +62,8 @@ public class TunerActivity extends AppCompatActivity {
     private AudioProcessor mAudioProcessor;
     private ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private TextView mFrequencyView;
+    private TuningView mTuningView;
+
 
     private MyView vw;
 
@@ -153,7 +155,20 @@ public class TunerActivity extends AppCompatActivity {
                     @SuppressLint("DefaultLocale")
                     @Override
                     public void run() {
-                        //mFrequencyView.setText(String.format("%.02fHz", freq));
+                        mTuningView.setSelectedIndex(index, true);
+
+                        final View goodPitchView = findViewById(R.id.good_pitch_view);
+                        if (goodPitchView != null) {
+                            if (goodPitch) {
+                                if (goodPitchView.getVisibility() != View.VISIBLE) {
+                                    Utils.reveal(goodPitchView);
+                                }
+                            } else if (goodPitchView.getVisibility() == View.VISIBLE) {
+                                Utils.hide(goodPitchView);
+                            }
+                        }
+
+                        mFrequencyView.setText(String.format("%.02fHz", freq));
                     }
                 });
 
@@ -179,22 +194,26 @@ public class TunerActivity extends AppCompatActivity {
         Utils.setupActivityTheme(this);
         super.onCreate(savedInstanceState);
 
+/*
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
 
         vw = new MyView(this);
         ll.addView(vw);
         setContentView(ll);
+*/
 
-        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mTuning = Tuning.getTuning(this, Preferences.getString(this, getString(R.string.pref_tuning_key), getString(R.string.standard_tuning_val)));
 
 
+        mTuningView = (TuningView) findViewById(R.id.tuning_view);
+        mTuningView.setTuning(mTuning);
 
-        //mFrequencyView = (TextView) findViewById(R.id.frequency_view);
-        //mFrequencyView.setText(String.format("%.02fHz", mTuning.pitches[0].frequency));
+        mFrequencyView = (TextView) findViewById(R.id.frequency_view);
+        mFrequencyView.setText(String.format("%.02fHz", mTuning.pitches[0].frequency));
 
         requestPermissions();
     }
@@ -239,7 +258,11 @@ public class TunerActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //mFrequencyView.setText(String.format("%.02fHz", savedInstanceState.getFloat(STATE_LAST_FREQ)));
+        int pitchIndex = savedInstanceState.getInt(STATE_PITCH_INDEX);
+        mTuningView.setSelectedIndex(pitchIndex);
+
+
+        mFrequencyView.setText(String.format("%.02fHz", savedInstanceState.getFloat(STATE_LAST_FREQ)));
     }
 
 

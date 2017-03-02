@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GuitarTuner.iml" filepath="$PROJECT_DIR$/GuitarTuner.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/guitar-tuner1.iml" filepath="$PROJECT_DIR$/guitar-tuner1.iml" />
     </modules>
   </component>
 </project>

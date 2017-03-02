@@ -63,12 +63,19 @@ public class Tuning {
         if (name.equals(context.getString(R.string.standard_tuning_val))) {
             return new Tuning(name,
                     new Pitch[]{
-                            new Pitch(82.41F, "E"),
+/*                            new Pitch(82.41F, "E"),
                             new Pitch(110.00F, "A"),
                             new Pitch(146.83F, "D"),
                             new Pitch(196.00F, "G"),
                             new Pitch(246.94F, "B"),
+                            new Pitch(329.63F, "E"),*/
+                            new Pitch(261.63F, "C"),
+                            new Pitch(293.67F, "D"),
                             new Pitch(329.63F, "E"),
+                            new Pitch(349.23F, "F"),
+                            new Pitch(392.00F, "G"),
+                            new Pitch(440.00F, "A"),
+                            new Pitch(493.88F, "B"),
                     });
         }
         else if (name.equals(context.getString(R.string.open_a_tuning_val))) {
